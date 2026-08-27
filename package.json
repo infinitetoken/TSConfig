@@ -1,0 +1,36 @@
+{
+  "name": "@infinitetoken/tsconfig",
+  "version": "0.1.0",
+  "description": "Shared base tsconfig for InfiniteToken TypeScript packages",
+  "keywords": [
+    "config",
+    "tsconfig",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/infinitetoken/tsconfig.git"
+  },
+  "license": "MIT",
+  "author": "Jay Deaton",
+  "sideEffects": false,
+  "type": "commonjs",
+  "exports": {
+    "./package.json": "./package.json",
+    "./tsconfig.json": "./tsconfig.json"
+  },
+  "files": [
+    "tsconfig.json"
+  ],
+  "scripts": {
+    "ci": "npm test",
+    "test": "tsc --noEmit -p test/tsconfig.json",
+    "preversion": "npm run ci"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
