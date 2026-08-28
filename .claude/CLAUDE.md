@@ -10,7 +10,7 @@ Shared base `tsconfig.json` for InfiniteToken TypeScript packages. Part of the `
 
 ```bash
 npm test    # tsc --noEmit against test/fixture.ts, which extends tsconfig.json
-npm run ci  # same as npm test
+npm run verify  # same as npm test
 ```
 
 ## Release

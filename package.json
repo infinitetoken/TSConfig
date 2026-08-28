@@ -21,22 +21,33 @@
   "type": "commonjs",
   "exports": {
     ".": "./tsconfig.json",
+    "./node": "./node.json",
     "./package.json": "./package.json",
+    "./react-native": "./react-native.json",
+    "./server": "./server.json",
     "./tsconfig.json": "./tsconfig.json"
   },
   "files": [
-    "tsconfig.json"
+    "tsconfig.json",
+    "node.json",
+    "react-native.json",
+    "server.json"
   ],
   "scripts": {
-    "ci": "npm test",
+    "fix": "eslint . --fix",
+    "lint": "eslint .",
     "release": "git push --follow-tags",
     "release:major": "npm version major && npm run release",
     "release:minor": "npm version minor && npm run release",
     "release:patch": "npm version patch && npm run release",
     "test": "tsc --noEmit -p test/tsconfig.json",
-    "preversion": "npm run ci"
+    "verify": "npm run lint && npm test",
+    "preversion": "npm run verify"
   },
+  "prettier": "@infinitetoken/eslint-config/prettier",
   "devDependencies": {
+    "@infinitetoken/eslint-config": "^0.1.4",
+    "eslint": "^9.39.4",
     "typescript": "^6.0.3"
   },
   "publishConfig": {
