@@ -1,0 +1,7 @@
+{
+  "extends": "../../server.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["fixture.ts", "fixture.json"]
+}

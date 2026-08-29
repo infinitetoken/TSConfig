@@ -1,0 +1,7 @@
+{
+  "extends": "../../react-native.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["fixture.tsx"]
+}
