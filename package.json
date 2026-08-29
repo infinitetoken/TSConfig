@@ -1,6 +1,6 @@
 {
   "name": "@infinitetoken/tsconfig",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Shared base tsconfig for InfiniteToken TypeScript packages, with an opt-in tsup build config",
   "keywords": [
     "config",
