@@ -32,29 +32,18 @@ That's the whole file for a typical Node/kit package — every other compiler op
 
 ## tsup config
 
-Opt-in — only relevant if the package builds with `tsup`. Unlike `tsconfig.json`, a `tsup.config` file is executable code with no path-resolution sharing limitation, so this is a plain factory function, not a JSON preset. Use a `tsup.config.cjs` (not `.ts`) so it loads directly with `require()` instead of going through tsup's ESM-bundling loader.
-
-The common case — one library entry, cjs+esm, with declarations, cleaning `dist/` first:
+Opt-in — only relevant if the package builds with `tsup`. Unlike `tsconfig.json`, a `tsup.config` file is executable code with no path-resolution sharing limitation, so this is a plain factory function — same shape as `@infinitetoken/jest-config`'s presets, a bare function you call, nothing invoked by name off an object. Use a `tsup.config.cjs` (not `.ts`) so it loads directly with `require()` instead of going through tsup's ESM-bundling loader.
 
 ```js
 // tsup.config.cjs
-module.exports = require('@infinitetoken/tsconfig/tsup').createTsupConfig()
+module.exports = require('@infinitetoken/tsconfig/tsup')()
 ```
 
-For a package with more than one entry point (e.g. a library plus a CLI bin), compose `entryConfig`/`cliConfig` yourself. Only the first entry should set `clean: true` — later entries with `clean: true` would wipe out what the earlier ones just wrote:
+That's the whole file for one library entry point — cjs+esm, with declarations, cleaning `dist/` first. Pass a different entry or override anything tsup accepts: `require('@infinitetoken/tsconfig/tsup')('src/main.ts', { minify: true })`.
 
-```js
-// tsup.config.cjs
-const { defineConfig, entryConfig, cliConfig } = require('@infinitetoken/tsconfig/tsup')
+A package with more than one entry point (a library plus a CLI bin, say) isn't covered by this factory yet — write `tsup.config.cjs` by hand with `tsup`'s own `defineConfig([...])` for that case, same as before this package existed.
 
-module.exports = defineConfig([
-  entryConfig('src/index.ts', { clean: true }),
-  entryConfig('src/shapes.ts'),
-  cliConfig('src/cli.ts')
-])
-```
-
-`createTsupConfig(entry?, overrides?)` and `entryConfig` both default `dts: true` — a package doing `tsup && tsc --emitDeclarationOnly` as two separate steps (rather than letting tsup's own entry-scoped `dts` option handle it) will end up shipping declarations for every file `tsconfig.json`'s `include` matches, `__tests__` included, not just the real entry point.
+`createTsupConfig` defaults `dts: true` — a package doing `tsup && tsc --emitDeclarationOnly` as two separate steps (rather than letting tsup's own entry-scoped `dts` option handle it) will end up shipping declarations for every file `tsconfig.json`'s `include` matches, `__tests__` included, not just the real entry point.
 
 ## Release
 
