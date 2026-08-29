@@ -1,6 +1,6 @@
 # @infinitetoken/tsconfig
 
-Shared base `tsconfig.json` for InfiniteToken TypeScript packages. Holds the compiler flags every repo agrees on (strictness, declaration output, consistent casing). Also ships an opt-in `tsup` build config factory (`@infinitetoken/tsconfig/tsup`) — see [tsup config](#tsup-config) below.
+Shared base `tsconfig.json` for InfiniteToken TypeScript packages. Holds the compiler flags every repo agrees on (strictness, declaration output, consistent casing). Also ships opt-in `tsup` build config factories for a library, a CLI, or both — see [tsup config](#tsup-config) below.
 
 ## Presets
 
@@ -32,18 +32,48 @@ That's the whole file for a typical Node/kit package — every other compiler op
 
 ## tsup config
 
-Opt-in — only relevant if the package builds with `tsup`. Unlike `tsconfig.json`, a `tsup.config` file is executable code with no path-resolution sharing limitation, so this is a plain factory function — same shape as `@infinitetoken/jest-config`'s presets, a bare function you call, nothing invoked by name off an object. Use a `tsup.config.cjs` (not `.ts`) so it loads directly with `require()` instead of going through tsup's ESM-bundling loader.
+Opt-in — only relevant if the package builds with `tsup`. Unlike `tsconfig.json`, a `tsup.config` file is executable code with no path-resolution sharing limitation, so these are plain factory functions — same shape as `@infinitetoken/jest-config`'s presets, a bare function you call, nothing invoked by name off an object. Use a `tsup.config.cjs` (not `.ts`) so it loads directly with `require()` instead of going through tsup's ESM-bundling loader. Pick the export that matches what the package actually ships:
+
+| Export | Use for |
+| --- | --- |
+| `@infinitetoken/tsconfig/tsup/lib` | A library with no CLI — one entry, cjs+esm, declarations, cleans `dist/` |
+| `@infinitetoken/tsconfig/tsup/cli` | A CLI with no separate library export (`main`/`exports` point straight at the built bin) — one entry, esm-only, Node shebang banner, no declarations |
+| `@infinitetoken/tsconfig/tsup/lib-cli` | A package that ships both — a real, separately-importable library **and** a CLI bin — the library entry (cjs+esm, declarations, cleans `dist/`) plus the CLI entry (esm-only, shebang, no declarations) |
+
+The plain library case — one entry point, nothing else:
 
 ```js
 // tsup.config.cjs
-module.exports = require('@infinitetoken/tsconfig/tsup')()
+module.exports = require('@infinitetoken/tsconfig/tsup/lib')()
 ```
 
-That's the whole file for one library entry point — cjs+esm, with declarations, cleaning `dist/` first. Pass a different entry or override anything tsup accepts: `require('@infinitetoken/tsconfig/tsup')('src/main.ts', { minify: true })`.
+Pass a different entry or override anything tsup accepts: `require('@infinitetoken/tsconfig/tsup/lib')('src/main.ts', { minify: true })`.
 
-A package with more than one entry point (a library plus a CLI bin, say) isn't covered by this factory yet — write `tsup.config.cjs` by hand with `tsup`'s own `defineConfig([...])` for that case, same as before this package existed.
+A CLI-only package:
 
-`createTsupConfig` defaults `dts: true` — a package doing `tsup && tsc --emitDeclarationOnly` as two separate steps (rather than letting tsup's own entry-scoped `dts` option handle it) will end up shipping declarations for every file `tsconfig.json`'s `include` matches, `__tests__` included, not just the real entry point.
+```js
+// tsup.config.cjs
+module.exports = require('@infinitetoken/tsconfig/tsup/cli')()
+```
+
+A package with both a library and a CLI:
+
+```js
+// tsup.config.cjs
+module.exports = require('@infinitetoken/tsconfig/tsup/lib-cli')()
+```
+
+That returns the full two-entry array (`createTsupLibCliConfig(libEntry?, cliEntry?, { lib?, cli? })` — defaults to `src/index.ts` / `src/cli.ts`). A package with an extra entry beyond those two (e.g. a separate subpath export) can spread it and append its own:
+
+```js
+// tsup.config.cjs
+const { defineConfig } = require('tsup')
+const createTsupLibCliConfig = require('@infinitetoken/tsconfig/tsup/lib-cli')
+
+module.exports = defineConfig([...createTsupLibCliConfig(), { entry: ['src/shapes.ts'], format: ['esm', 'cjs'], dts: true }])
+```
+
+All three default `dts: true` on every entry that represents real importable code (never on a CLI entry — nobody imports a bin as a typed library) — a package doing `tsup && tsc --emitDeclarationOnly` as two separate steps, rather than letting tsup's own entry-scoped `dts` option handle it, will end up shipping declarations for every file `tsconfig.json`'s `include` matches, `__tests__` included, not just the real entry point.
 
 ## Release
 

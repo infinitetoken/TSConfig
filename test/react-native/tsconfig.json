@@ -1,5 +1,5 @@
 {
-  "extends": "../../react-native.json",
+  "extends": "../../src/react-native.json",
   "compilerOptions": {
     "noEmit": true
   },

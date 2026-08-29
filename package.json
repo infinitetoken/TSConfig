@@ -21,20 +21,18 @@
   "sideEffects": false,
   "type": "commonjs",
   "exports": {
-    ".": "./tsconfig.json",
-    "./node": "./node.json",
+    ".": "./src/tsconfig.json",
+    "./node": "./src/node.json",
     "./package.json": "./package.json",
-    "./react-native": "./react-native.json",
-    "./server": "./server.json",
-    "./tsconfig.json": "./tsconfig.json",
-    "./tsup": "./tsup.cjs"
+    "./react-native": "./src/react-native.json",
+    "./server": "./src/server.json",
+    "./tsconfig.json": "./src/tsconfig.json",
+    "./tsup/cli": "./src/tsup/cli.cjs",
+    "./tsup/lib": "./src/tsup/lib.cjs",
+    "./tsup/lib-cli": "./src/tsup/lib-cli.cjs"
   },
   "files": [
-    "tsconfig.json",
-    "node.json",
-    "react-native.json",
-    "server.json",
-    "tsup.cjs"
+    "src"
   ],
   "scripts": {
     "fix": "eslint . --fix",

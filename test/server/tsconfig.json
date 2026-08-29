@@ -1,5 +1,5 @@
 {
-  "extends": "../../server.json",
+  "extends": "../../src/server.json",
   "compilerOptions": {
     "noEmit": true
   },
