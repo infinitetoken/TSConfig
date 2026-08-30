@@ -1,0 +1,4 @@
+{
+  "extends": "../../src/expo.json",
+  "include": ["fixture.tsx"]
+}

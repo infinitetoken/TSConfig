@@ -22,6 +22,7 @@
   "type": "commonjs",
   "exports": {
     ".": "./src/tsconfig.json",
+    "./expo": "./src/expo.json",
     "./node": "./src/node.json",
     "./package.json": "./package.json",
     "./react-native": "./src/react-native.json",

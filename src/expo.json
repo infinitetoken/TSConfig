@@ -1,0 +1,7 @@
+{
+  "extends": "./react-native.json",
+  "compilerOptions": {
+    "moduleDetection": "force",
+    "allowJs": true
+  }
+}
