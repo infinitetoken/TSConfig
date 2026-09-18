@@ -60,6 +60,47 @@ A few things worth knowing before copying this in:
 - **If `app.json` has `"experiments": { "typedRoutes": true }`,** also add `".expo/types/**/*.ts"` and `"expo-env.d.ts"` to `include`. TypeScript's `include` globs don't traverse dot-directories by default (verified directly — `**/*.ts` silently skips anything under `.expo/`), so without that entry `tsc` won't see Expo Router's generated route-param types. It's not a hard failure either way — `Href` just falls back to a looser, unchecked type — but it is a silent loss of the type-checking the feature is supposed to provide.
 - **The first migration in an app almost never a pure config swap.** `expo/tsconfig.base` (what every app currently extends) sets no strictness at all — `strict`, `noUnusedLocals`, `noUnusedParameters`, and `noImplicitReturns` all come from `@infinitetoken/tsconfig`'s base preset, for the first time, the moment an app switches. Expect real, pre-existing violations to surface immediately (unused `React` imports left over from before the new JSX transform, unused variables, a branch genuinely missing a `return`) — verified directly against one real app in this fleet, which surfaced 10 such errors on the first `tsc` run. Budget a small cleanup pass per app, not just a one-line `extends` change.
 
+## Skia paths fragment
+
+`@infinitetoken/tsconfig/skia-paths` — opt-in, only relevant to apps that import `@shopify/react-native-skia` (an Expo/RN app rendering to a `Canvas`; AirHockey, BoxHockey, and Pong in this fleet so far). It works around a real typecheck failure, not a hypothetical one:
+
+`@shopify/react-native-skia` ships no `exports` map, so its top-level `"react-native"` field resolves bare imports to raw, untranspiled `src/index.ts`. The `/react-native` and `/expo` presets' own `customConditions: ["react-native"]` (matching Metro's real resolution) correctly follows that field, which pulls the package's own `web/WithSkiaWeb.tsx` into the typecheck program — and that file has a genuine unused `React` import upstream (present in the latest published version too, not just one pinned release) that fails under this package's base preset's `noUnusedLocals`. Weakening `customConditions` would break other, unrelated deps' own `exports`-map `"react-native"` conditions; weakening `noUnusedLocals` would turn off a check that's doing real work everywhere else. Instead, the fragment redirects the package — and its own directly-imported `/src/web` deep path, used to lazy-load the CanvasKit WASM runtime on web — to their compiled `.d.ts` counterparts for typecheck purposes only:
+
+```json
+{
+  "@shopify/react-native-skia": ["./node_modules/@shopify/react-native-skia/lib/typescript/src/index.d.ts"],
+  "@shopify/react-native-skia/src/web": ["./node_modules/@shopify/react-native-skia/lib/typescript/src/web/index.d.ts"]
+}
+```
+
+**This can't be pulled in through `extends` the way the presets above are.** TypeScript does not merge nested `compilerOptions.paths` objects across an `extends` chain — verified directly against this package's own installed TypeScript (6.0.3): whichever config sets `paths` *last* in resolution order wins the whole object, not just the keys it names. A two-file fixture where the override's `paths` didn't even share a key with the base's still ended up with only the override's entry; the base's was silently dropped, not merged, and the same thing happens between two array-`extends` entries with no local override at all. Since every real consumer of this fragment already sets its own `paths` (its `@/*` aliases), adding `@infinitetoken/tsconfig/skia-paths` to an `extends` array alongside those aliases would just make one of the two disappear, not combine them.
+
+So the opt-in is a spread, not an `extends` entry — the same shape as spreading `@infinitetoken/tsconfig/tsup/lib-cli`'s own array result into a bigger tsup config in [tsup config](#tsup-config) below. Anywhere that already runs through Node, spread it directly:
+
+```js
+const skiaPaths = require('@infinitetoken/tsconfig/skia-paths')
+
+const paths = { ...appOwnPaths, ...skiaPaths }
+```
+
+A plain hand-authored `tsconfig.json` has no `require()` to run — the fragment is JSON, not executable — so there the "spread" is inlining its two entries verbatim next to your own aliases, with `src/skia-paths.json` in this package as the one canonical copy to diff against (instead of three independently-drifting copies of the same block) whenever `@shopify/react-native-skia`'s own layout changes:
+
+```json
+{
+  "extends": "@infinitetoken/tsconfig/expo",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"],
+      "@/components/*": ["./src/components/*"],
+      // spread from @infinitetoken/tsconfig/skia-paths — see that package's README before editing
+      "@shopify/react-native-skia": ["./node_modules/@shopify/react-native-skia/lib/typescript/src/index.d.ts"],
+      "@shopify/react-native-skia/src/web": ["./node_modules/@shopify/react-native-skia/lib/typescript/src/web/index.d.ts"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}
+```
+
 ## tsup config
 
 Opt-in — only relevant if the package builds with `tsup`. Unlike `tsconfig.json`, a `tsup.config` file is executable code with no path-resolution sharing limitation, so these are plain factory functions — same shape as `@infinitetoken/jest-config`'s presets, a bare function you call, nothing invoked by name off an object. Use a `tsup.config.cjs` (not `.ts`) so it loads directly with `require()` instead of going through tsup's ESM-bundling loader. Pick the export that matches what the package actually ships:

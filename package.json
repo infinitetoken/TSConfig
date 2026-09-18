@@ -27,6 +27,7 @@
     "./package.json": "./package.json",
     "./react-native": "./src/react-native.json",
     "./server": "./src/server.json",
+    "./skia-paths": "./src/skia-paths.json",
     "./tsconfig.json": "./src/tsconfig.json",
     "./tsup/cli": "./src/tsup/cli.cjs",
     "./tsup/lib": "./src/tsup/lib.cjs",

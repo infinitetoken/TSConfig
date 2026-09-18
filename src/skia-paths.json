@@ -1,0 +1,4 @@
+{
+  "@shopify/react-native-skia": ["./node_modules/@shopify/react-native-skia/lib/typescript/src/index.d.ts"],
+  "@shopify/react-native-skia/src/web": ["./node_modules/@shopify/react-native-skia/lib/typescript/src/web/index.d.ts"]
+}
