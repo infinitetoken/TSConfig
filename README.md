@@ -9,7 +9,7 @@ Shared base `tsconfig.json` for InfiniteToken TypeScript packages. Holds the com
 | `@infinitetoken/tsconfig` / `@infinitetoken/tsconfig/tsconfig.json` | Universal core — strictness-only flags (`strict`, `declaration`, `noUnusedLocals`, etc). Rarely used directly; every variant below extends it. |
 | `@infinitetoken/tsconfig/node` | Node/kit packages, RN library packages (via `/react-native`, below) — `target: esnext`, `module: preserve`, `moduleResolution: bundler`, `types: [jest, node]` |
 | `@infinitetoken/tsconfig/server` | Express/server apps (unpublished) — `module: commonjs`, `resolveJsonModule: true`, `types: [jest, node]`, and relaxes six strictness flags (`declaration`, `declarationMap`, `noUnusedLocals`, `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`) back to `false` |
-| `@infinitetoken/tsconfig/react-native` | React Native packages (bare RN, and RN libraries published to npm) — extends `/node`, adds `target: ESNext`, `lib: [DOM, ESNext]`, `jsx: react-jsx`, `sourceMap: true`, `allowSyntheticDefaultImports: true`, `resolveJsonModule: true`, `noEmit: true`, `customConditions: [react-native]` |
+| `@infinitetoken/tsconfig/react-native` | React Native packages (bare RN, and RN libraries published to npm) — extends `/node`, adds `target: ESNext`, `lib: [DOM, ESNext]`, `jsx: react-jsx`, `sourceMap: true`, `allowSyntheticDefaultImports: true`, `resolveJsonModule: true`, `noEmit: true`, `customConditions: [react-native, react-native-legacy-deep-imports]` (the second one is temporary, see below) |
 | `@infinitetoken/tsconfig/expo` | Expo apps — extends `/react-native`, adds `moduleDetection: force`, `allowJs: true` |
 
 ## Usage
@@ -154,3 +154,8 @@ Tag-based, using npm trusted publishing (OIDC, no token required):
 npm version patch   # or minor / major
 git push --follow-tags
 ```
+
+## React Native 0.88's strict types are deferred (temporary)
+
+React Native 0.88 (Expo SDK 58) makes its Strict TypeScript API the default: refs take instance types (`ViewInstance`, `TextInputInstance`) and deep `react-native/Libraries/*` imports are type errors. The `/react-native` and `/expo` presets add the `react-native-legacy-deep-imports` condition, which 0.88's `exports` map points at its old `types_DEPRECATED` declarations, so code written against 0.86 still type-checks. React Native removes that escape hatch after 0.88, so this condition has to go (and the code it shields has to move to the strict types) before Expo SDK 59. On React Native 0.86 and earlier the condition matches nothing and changes nothing. See TODO.md.
+

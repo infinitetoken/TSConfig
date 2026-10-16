@@ -49,13 +49,13 @@
   },
   "prettier": "@infinitetoken/eslint-config/prettier",
   "devDependencies": {
-    "@infinitetoken/eslint-config": "^0.1.4",
+    "@infinitetoken/eslint-config": "^0.2.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.4.0",
     "@types/react": "^19.2.18",
     "eslint": "^9.39.4",
     "react": "^19.2.8",
-    "react-native": "^0.87.1",
+    "react-native": "^0.88.0",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3"
   },

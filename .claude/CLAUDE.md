@@ -114,3 +114,8 @@ git push --follow-tags
 ```
 
 The `publish.yml` workflow fires on `v*` tags and runs `npm publish`.
+
+## Temporary: React Native 0.88 legacy types (2026-10-16)
+
+`./react-native` (and so `./expo`) adds `react-native-legacy-deep-imports` to `customConditions`. React Native 0.88's `exports` sends that condition to `types_DEPRECATED`, its pre-strict declarations, so the fleet's code type-checks on Expo SDK 58 without the ref-type migration. It's a deferral, not a fix, and React Native drops it after 0.88: see TODO.md for the removal plan and the measured error counts. Harmless on 0.86 and earlier (the condition matches nothing there).
+
