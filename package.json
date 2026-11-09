@@ -51,16 +51,16 @@
   "devDependencies": {
     "@infinitetoken/eslint-config": "^0.2.1",
     "@types/jest": "^30.0.0",
-    "@types/node": "^26.4.0",
-    "@types/react": "^19.2.18",
-    "eslint": "^9.39.4",
-    "react": "^19.2.8",
-    "react-native": "^0.88.0",
-    "tsup": "^8.5.1",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "eslint": "^10.14.0",
+    "react": "^19.3.0",
+    "react-native": "^0.88.1",
+    "tsup": "^9.0.0",
     "typescript": "^6.0.3"
   },
   "peerDependencies": {
-    "tsup": "^8.0.0"
+    "tsup": "^9.0.0"
   },
   "peerDependenciesMeta": {
     "tsup": {
