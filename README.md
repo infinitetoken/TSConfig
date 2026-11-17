@@ -159,3 +159,7 @@ git push --follow-tags
 
 React Native 0.88 (Expo SDK 58) makes its Strict TypeScript API the default: refs take instance types (`ViewInstance`, `TextInputInstance`) and deep `react-native/Libraries/*` imports are type errors. The `/react-native` and `/expo` presets add the `react-native-legacy-deep-imports` condition, which 0.88's `exports` map points at its old `types_DEPRECATED` declarations, so code written against 0.86 still type-checks. React Native removes that escape hatch after 0.88, so this condition has to go (and the code it shields has to move to the strict types) before Expo SDK 59. On React Native 0.86 and earlier the condition matches nothing and changes nothing. See TODO.md.
 
+
+---
+
+Made by [Infinite Token](https://www.infinitetoken.com), the team behind [Lumber](https://lumber.infinitetoken.com): end-to-end encrypted logging.
